@@ -1,0 +1,65 @@
+---
+title: "Mental_Health_DataCleaning"
+output: html_document
+---
+
+```{r setup, include=FALSE} 
+knitr::opts_chunk$set(warning = FALSE, message = FALSE)
+```
+
+```{r}
+#Importing data
+survey <- read.csv("C:/Users/Hemanshi/Desktop/Langara/Term 3/CPSC - Visualization for DA/Final Exam/Marwaha_Hemanshi_RShiny/survey.csv")
+```
+
+```{r}
+str(survey)
+```
+```{r}
+df1<- survey %>%
+  select(Age, Gender, Country, state,family_history,work_interfere,self_employed,no_employees,remote_work,tech_company,care_options,wellness_program,seek_help,anonymity,leave, treatment, benefits,supervisor,mental_health_interview, mental_health_consequence, phys_health_interview, mental_vs_physical, obs_consequence) %>% 
+  filter(Age>=18 & Age<=65)
+```
+
+```{r}
+male_str <- c("male","Male (CIS)", "m", "M", "Male-ish","cis male","maile", "Mal", "Male", "Cis Male", "Make", "male ", "Man","msle", "Mail", "Malr","Cis Man", "Guy (-ish) ^_^", "Male ")
+trans_str <- c("male leaning androgynous","Female (trans)","Trans-female", "something kinda male?", "queer/she/they", "non-binary","Nah", "All", "Enby", "fluid", "Genderqueer", "Androgyne", "Agender", "male leaning androgynous", "guy (-ish) ^_^", "Trans woman", "Neuter", "female (trans)", "queer", "ostensibly male, unsure what that really means" )
+female_str <- c("Female", "woman", "Female (cis)", "f", "F", "female", "Woman",  "Femake", "Female","cis-female/femme", "Cis Female", "femail", "Female ")
+```
+
+```{r}
+df1 <- df1 %>%
+  filter(Gender != "a little about you",
+         Gender != "p")
+
+df1$Gender <- sapply(as.vector(df1$Gender), function(x) if(x %in% male_str) "Male" else x )
+df1$Gender <- sapply(as.vector(df1$Gender), function(x) if(x %in% female_str) "Female" else x )
+df1$Gender <- sapply(as.vector(df1$Gender), function(x) if(x %in% trans_str) "Trans" else x )
+```
+
+```{r}
+unique(df1$Gender)
+```
+```{r}
+sapply(df1, function(x) sum(is.na (x)))
+```
+```{r}
+library(tidyr)
+df1<- df1 %>% drop_na(self_employed)
+```
+
+```{r}
+#Selecting the variables for our further analysis
+
+final_df <- df1 %>%
+  select(Age, Gender, Country, state,family_history,self_employed,remote_work,tech_company,care_options,wellness_program,seek_help,anonymity,leave, treatment, benefits,supervisor,mental_health_interview, mental_health_consequence, phys_health_interview, mental_vs_physical, obs_consequence)
+```
+
+```{r}
+sapply(final_df, function(x) sum(is.na (x)))
+```
+```{r}
+#Exporting the dataset
+write.csv(final_df,"C:/Users/Hemanshi/Desktop/Langara/Term 3/CPSC - Visualization for DA/Final Exam/Marwaha_Hemanshi_RShiny/survey_cleaned.csv")
+```
+
